@@ -1,0 +1,43 @@
+
+import requests
+import json
+import pyodbc
+
+##API Key
+api_ = "https://api.data.gov/ed/collegescorecard/v1/schools.json?school.degrees_awarded.predominant=2,3&fields=id,school.name,2013.student.size&api_key=YgIWNbjm9LyfefkanexPQSyeS0bEiFP2KBWpNeLp"
+
+pip install prettytable
+
+from prettytable import PrettyTable
+
+## Set Loop settings
+page = 0
+all_results = []
+max_pages = 100
+
+##Run Loop
+while page < max_pages:
+    response = requests.get(api_)
+    data = response.json()
+    
+    results = data['results']
+    all_results.extend(results)
+    
+    if page >= data['metadata']['total']:
+        break
+    page += 1
+
+##Create Table
+dtable = PrettyTable()
+
+##Create Column Names
+dtable.field_names = ['ID','School Name','Student Size (2013)']
+
+##Input Data to Table
+for result in all_results:
+    school_id = result['id']
+    school_name = result['school.name']
+    school_size = result['2013.student.size']
+    dtable.add_row([school_id,school_name,school_size])
+print(dtable)
+
